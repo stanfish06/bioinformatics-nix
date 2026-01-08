@@ -4,22 +4,18 @@
     { system, pkgs, ... }:
     let
       unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
-      rpkgs = pkgs.rWrapper.override {
-        packages = with pkgs.rPackages; [
-          ggplot2
-          tidyverse
-          ChIPseeker
-          ComplexHeatmap
-        ];
-      };
+      rpkgs = with pkgs.rPackages; [
+        ggplot2
+        tidyverse
+        ChIPseeker
+        ComplexHeatmap
+      ];
     in
     {
       devShells.analysis = pkgs.mkShell {
         packages = with pkgs; [
-          R
-          rpkgs
+          (rstudioWrapper.override { packages = rpkgs; })
           python3
-          rstudio
           (python3.withPackages (
             ps: with ps; [
               numpy

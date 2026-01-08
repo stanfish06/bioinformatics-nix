@@ -18,6 +18,7 @@
         systems = [ "x86_64-linux" ];
         imports = [
           ./modules/preprocess.nix
+          ./modules/analysis.nix
         ];
       }
     );

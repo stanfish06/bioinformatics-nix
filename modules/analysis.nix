@@ -191,6 +191,45 @@
         doCheck = false;
       };
 
+      crossmap = python.pkgs.buildPythonPackage rec {
+        pname = "crossmap";
+        version = "0.7.3";
+        format = "other";
+
+        src = python.pkgs.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256-xXk9G7/qlis/IdjNmDCnmhabOj7GRhVV2Bm+Els5H20=";
+        };
+
+        nativeBuildInputs = with python.pkgs; [
+          setuptools
+          wheel
+          pip
+        ];
+
+        buildPhase = ''
+          runHook preBuild
+          export PYTHONPATH="${python.pkgs.setuptools}/${python.sitePackages}:${python.pkgs.wheel}/${python.sitePackages}:${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          export PYTHONPATH="${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip install dist/*.whl --no-deps --prefix=$out
+          runHook postInstall
+        '';
+
+        propagatedBuildInputs = with python.pkgs; [
+          pysam
+          bx-python
+          pybigwig
+        ];
+
+        doCheck = false;
+      };
+
       pyGenomeTracks = python.pkgs.buildPythonPackage rec {
         pname = "pyGenomeTracks";
         version = "3.9";
@@ -262,6 +301,7 @@
               statsmodels
               jupyterlab
               pyGenomeTracks
+              crossmap
               deeptools
             ]
           ))

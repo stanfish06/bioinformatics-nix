@@ -6,6 +6,7 @@
       unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
       rpkgs = with pkgs.rPackages; [
         ggplot2
+        ggraph
         tidyverse
         ChIPseeker
         ComplexHeatmap

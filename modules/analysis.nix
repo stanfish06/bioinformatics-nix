@@ -277,7 +277,6 @@
             bx-python
           ]
           ++ [
-            pkgs.deeptools
             pybedtools
             gffutils
             hicmatrix
@@ -285,27 +284,32 @@
 
         doCheck = false;
       };
+      pythonEnv = python.withPackages (
+        ps: with ps; [
+          numpy
+          scipy
+          pandas
+          seaborn
+          matplotlib
+          statsmodels
+          jupyterlab
+          pyGenomeTracks
+          crossmap
+        ]
+      );
     in
     {
       devShells.analysis = pkgs.mkShell {
         packages = with pkgs; [
           (rstudioWrapper.override { packages = rpkgs; })
-          python
-          (python.withPackages (
-            ps: with ps; [
-              numpy
-              scipy
-              pandas
-              seaborn
-              matplotlib
-              statsmodels
-              jupyterlab
-              pyGenomeTracks
-              crossmap
-              deeptools
-            ]
-          ))
+          igv
+          samtools
+          deeptools
+          pythonEnv
         ];
+        shellHook = ''
+          export PYTHONPATH="${pythonEnv}/${python.sitePackages}"
+        '';
       };
     };
 }

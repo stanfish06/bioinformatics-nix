@@ -11,7 +11,7 @@
         ChIPseeker
         ComplexHeatmap
       ];
-      python = pkgs.python312;
+      python = pkgs.python313;
 
       pybedtools = python.pkgs.buildPythonPackage rec {
         pname = "pybedtools";
@@ -270,7 +270,6 @@
             matplotlib
             intervaltree
             pybigwig
-            future
             pysam
             tqdm
             pytest
@@ -307,9 +306,6 @@
           deeptools
           pythonEnv
         ];
-        shellHook = ''
-          export PYTHONPATH="${pythonEnv}/${python.sitePackages}"
-        '';
       };
     };
 }

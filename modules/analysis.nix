@@ -96,6 +96,51 @@
         doCheck = false;
       };
 
+      halp = python.pkgs.buildPythonPackage rec {
+        pname = "halp";
+        version = "1.1";
+        format = "other";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "Murali-group";
+          repo = "halp";
+          rev = "1.1";
+          sha256 = "sha256-pZVr9F0dwLvXJEtLraRAUxya9Eneu8FJNwC55KgVgGo=";
+        };
+
+        postPatch = ''
+          substituteInPlace setup.py --replace-fail 'version="1.0.0"' 'version="${version}"'
+        '';
+
+        nativeBuildInputs = with python.pkgs; [
+          setuptools
+          wheel
+          pip
+        ];
+
+        buildPhase = ''
+          runHook preBuild
+          export PYTHONPATH="${python.pkgs.setuptools}/${python.sitePackages}:${python.pkgs.wheel}/${python.sitePackages}:${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          export PYTHONPATH="${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip install dist/*.whl --no-deps --prefix=$out
+          runHook postInstall
+        '';
+
+        propagatedBuildInputs = with python.pkgs; [
+          numpy
+          scipy
+          networkx
+        ];
+
+        doCheck = false;
+      };
+
       pybedtools = python.pkgs.buildPythonPackage rec {
         pname = "pybedtools";
         version = "0.12.0";
@@ -378,6 +423,7 @@
           pyGenomeTracks
           crossmap
           hypernetx
+          halp
         ]
       );
     in
@@ -387,6 +433,7 @@
           (rstudioWrapper.override { packages = rpkgs; })
           igv
           samtools
+          bedtools
           deeptools
           pythonEnv
         ];

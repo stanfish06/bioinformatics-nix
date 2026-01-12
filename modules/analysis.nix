@@ -13,6 +13,89 @@
       ];
       python = pkgs.python313;
 
+      celluloid = python.pkgs.buildPythonPackage rec {
+        pname = "celluloid";
+        version = "0.2.0";
+        format = "other";
+
+        src = python.pkgs.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256-VosVEsSpdIN1npQ2w/Pl3FVm2jUBeaoYcpkuyNgnBuE=";
+        };
+
+        nativeBuildInputs = with python.pkgs; [
+          setuptools
+          wheel
+          pip
+          flit
+        ];
+
+        buildPhase = ''
+          runHook preBuild
+          export PYTHONPATH="${python.pkgs.setuptools}/${python.sitePackages}:${python.pkgs.wheel}/${python.sitePackages}:${python.pkgs.pip}/${python.sitePackages}:${python.pkgs.flit}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          export PYTHONPATH="${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip install dist/*.whl --no-deps --prefix=$out
+          runHook postInstall
+        '';
+
+        propagatedBuildInputs = with python.pkgs; [ matplotlib ];
+
+        doCheck = false;
+      };
+
+      hypernetx = python.pkgs.buildPythonPackage rec {
+        pname = "hypernetx";
+        version = "2.4.0";
+        format = "other";
+
+        src = python.pkgs.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256-acufTgcJ5I88d2/oMvkBBdc1lu3tUOIxVwGBhv+TkZQ=";
+        };
+
+        nativeBuildInputs = with python.pkgs; [
+          setuptools
+          wheel
+          pip
+          poetry-core
+        ];
+
+        buildPhase = ''
+          runHook preBuild
+          export PYTHONPATH="${python.pkgs.setuptools}/${python.sitePackages}:${python.pkgs.wheel}/${python.sitePackages}:${python.pkgs.pip}/${python.sitePackages}:${python.pkgs.poetry-core}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          export PYTHONPATH="${python.pkgs.pip}/${python.sitePackages}:$PYTHONPATH"
+          ${python}/bin/python -m pip install dist/*.whl --no-deps --prefix=$out
+          runHook postInstall
+        '';
+
+        propagatedBuildInputs =
+          with python.pkgs;
+          [
+            decorator
+            igraph
+            networkx
+            pandas
+            requests
+            scikit-learn
+            scipy
+          ]
+          ++ [ celluloid ];
+
+        doCheck = false;
+      };
+
       pybedtools = python.pkgs.buildPythonPackage rec {
         pname = "pybedtools";
         version = "0.12.0";
@@ -294,6 +377,7 @@
           jupyterlab
           pyGenomeTracks
           crossmap
+          hypernetx
         ]
       );
     in

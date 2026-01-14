@@ -17,7 +17,9 @@
       {
         systems = [ "x86_64-linux" ];
         imports = [
+          ./modules/dataFetch.nix
           ./modules/preprocess.nix
+          ./modules/alignment.nix
           ./modules/analysis.nix
         ];
       }

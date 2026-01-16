@@ -20,6 +20,7 @@
           ./modules/dataFetch.nix
           ./modules/preprocess.nix
           ./modules/alignment.nix
+          ./modules/epigenomics.nix
           ./modules/analysis.nix
         ];
       }

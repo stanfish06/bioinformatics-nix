@@ -45,7 +45,7 @@
 
       hypernetx = python.pkgs.buildPythonPackage rec {
         pname = "hypernetx";
-        version = "2.4.0";
+        version = "0.5.1";
         format = "other";
 
         src = python.pkgs.fetchPypi {

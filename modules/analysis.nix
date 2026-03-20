@@ -10,6 +10,10 @@
         tidyverse
         ChIPseeker
         ComplexHeatmap
+        DESeq2
+        Polychrome
+        patchwork
+        ggpubr
       ];
 
       python = pkgs.python3;

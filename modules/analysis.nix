@@ -28,6 +28,7 @@
           matplotlib
           statsmodels
           networkx
+          adjusttext
           jupyterlab
         ]
       );

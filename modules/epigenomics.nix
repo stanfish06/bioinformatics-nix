@@ -405,6 +405,107 @@
 
         doCheck = false;
       };
+
+      rpkgs = pkgs.rPackages;
+
+      # presto (immunogenomics/presto) — GitHub only, ArchR Import.
+      presto = rpkgs.buildRPackage {
+        name = "presto";
+        src = pkgs.fetchFromGitHub {
+          owner = "immunogenomics";
+          repo = "presto";
+          rev = "a24772a135c7895a8183b007376050556c60a05b";
+          hash = "sha256-gVgqEvSg9xMTvw0brYy6iyxJF2y2LT65EWRmGYYEQxw=";
+        };
+        propagatedBuildInputs = with rpkgs; [
+          Rcpp
+          RcppArmadillo
+          data_table
+          dplyr
+          tidyr
+          purrr
+          tibble
+          Matrix
+          rlang
+        ];
+      };
+
+      # chromVARmotifs (GreenleafLab/chromVARmotifs) — GitHub only, ArchR Import.
+      chromVARmotifs = rpkgs.buildRPackage {
+        name = "chromVARmotifs";
+        src = pkgs.fetchFromGitHub {
+          owner = "GreenleafLab";
+          repo = "chromVARmotifs";
+          rev = "38bed559c1f4770b6c91c80bf3f8ea965da26076";
+          hash = "sha256-uOTeryVTyUoFdRq2dSGE2+h5s7VFTntFmzS8DEMNO0U=";
+        };
+        propagatedBuildInputs = with rpkgs; [ TFBSTools ];
+      };
+
+      # ArchR (GreenleafLab/ArchR) — not in nixpkgs; built from the v1.0.3 release.
+      archr = rpkgs.buildRPackage {
+        name = "ArchR";
+        src = pkgs.fetchFromGitHub {
+          owner = "GreenleafLab";
+          repo = "ArchR";
+          rev = "v1.0.3";
+          hash = "sha256-kpZE4ECwZpEk5QHc+ZhT6rYRG/+efzVkhhn2LpvNrRk=";
+        };
+        # ArchR's ./configure is a telemetry ping to plausible.io via curl;
+        # it does nothing functional and breaks the sandboxed build. Drop it.
+        postPatch = "rm -f configure";
+        propagatedBuildInputs =
+          (with rpkgs; [
+            BiocGenerics
+            Biostrings
+            chromVAR
+            ComplexHeatmap
+            data_table
+            devtools
+            GenomicRanges
+            ggplot2
+            ggrepel
+            gridExtra
+            gtable
+            gtools
+            harmony
+            magrittr
+            Matrix
+            matrixStats
+            motifmatchr
+            nabor
+            plyr
+            Rcpp
+            RcppArmadillo
+            rhdf5
+            Rsamtools
+            S4Vectors
+            Seurat
+            SeuratObject
+            sparseMatrixStats
+            stringr
+            SummarizedExperiment
+            uwot
+          ])
+          ++ [
+            chromVARmotifs
+            presto
+          ];
+      };
+
+      rEnv = pkgs.rWrapper.override {
+        packages =
+          (with rpkgs; [
+            BSgenome_Hsapiens_UCSC_hg38
+            Matrix
+            GenomicRanges
+            S4Vectors
+            SummarizedExperiment
+            SingleCellExperiment
+            zellkonverter
+          ])
+          ++ [ archr ];
+      };
     in
     {
       devShells.epigenomics = pkgs.mkShell {
@@ -413,7 +514,13 @@
           macs2
           bedtools
           deeptools
+          rEnv
         ];
+
+        # ArchR's findMacs2() honours a MACS2_PATH pointing at the macs2 binary.
+        shellHook = ''
+          export MACS2_PATH=${pkgs.macs2}/bin/macs2
+        '';
       };
     };
 }

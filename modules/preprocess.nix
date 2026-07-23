@@ -1,10 +1,7 @@
-{ inputs, ... }:
+{ ... }:
 {
   perSystem =
-    { system, pkgs, ... }:
-    let
-      unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
-    in
+    { pkgs, ... }:
     {
       devShells.preprocess = pkgs.mkShell {
         packages = with pkgs; [

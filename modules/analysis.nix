@@ -1,9 +1,8 @@
-{ inputs, ... }:
+{ ... }:
 {
   perSystem =
-    { system, pkgs, ... }:
+    { pkgs, ... }:
     let
-      unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
       rpkgs = with pkgs.rPackages; [
         ggplot2
         ggraph
@@ -36,7 +35,7 @@
     {
       devShells.analysis = pkgs.mkShell {
         packages = with pkgs; [
-          R
+          (rWrapper.override { packages = rpkgs; })
           (rstudioWrapper.override { packages = rpkgs; })
           igv
           pythonEnv

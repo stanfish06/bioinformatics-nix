@@ -1,13 +1,7 @@
-{ inputs, ... }:
+{ ... }:
 {
   perSystem =
-    { system, ... }:
-    let
-      pkgs = import inputs.nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-    in
+    { pkgs, ... }:
     {
       devShells.dataFetch = pkgs.mkShell {
         packages = [

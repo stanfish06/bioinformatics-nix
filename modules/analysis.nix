@@ -13,6 +13,7 @@
         Polychrome
         patchwork
         ggpubr
+        tximport
       ];
 
       python = pkgs.python3;
